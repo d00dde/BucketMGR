@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Букерманагер</string>
+    <string name="btnCust">Заказчики</string>
+    <string name="reclama">Пиво "Шняга". Наверное, лучшая шняга среди пива.</string>
+    <string name="Goods">Товары</string>
+    <string name="addCust">Добавить заказчика</string>
+    <string name="addGoods">Добавить товар</string>
+
+</resources>

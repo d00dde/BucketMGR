@@ -41,14 +41,15 @@ public class CustGoodsActivity extends AppCompatActivity implements View.OnClick
         if (cust_id == -1)
             title.setText("Нет такого клиента");
         else
+            Log.d(Global.DTAG, " Запрошено имя для id : " + cust_id);
             title.setText(dbAgent.getCustName(cust_id));
+
 
         DBAgent dbagent = DBAgent.getAgent();
         Map<Integer, String> names = new TreeMap<>();
-        int debts[] = new int[dbagent.currGoods];
+        Map<Integer, Integer> debts = new TreeMap<>();
         dbagent.getGoodsNames(names);
         dbagent.getAllDebts(cust_id,debts);
-        int i = 0;
 
         LinearLayout scrolLay = (LinearLayout) findViewById(R.id.goodsLay);
         LayoutInflater inflanter = getLayoutInflater();
@@ -58,10 +59,9 @@ public class CustGoodsActivity extends AppCompatActivity implements View.OnClick
             Button btn = (Button) item.findViewById(R.id.btn_goods);
             TextView debt = (TextView) item.findViewById(R.id.debt);
             btn.setText(customer.getValue());
-            btn.setId(Properties.ID_BIAS + customer.getKey());
+            btn.setId(Global.ID_BIAS + customer.getKey());
             btn.setOnClickListener(this);
-            debt.setText("Долг: " + debts[i]);
-            i++;
+            debt.setText("Долг: " + debts.get(customer.getKey()) == null ? 0 : debts.get(customer.getKey()));
             scrolLay.addView(item);
 
         }
@@ -70,7 +70,7 @@ public class CustGoodsActivity extends AppCompatActivity implements View.OnClick
 
     @Override
     public void onClick(View v) {
-        String str = "Нажата кнопка номер " + (v.getId()-Properties.ID_BIAS);
+        String str = "Нажата кнопка номер " + (v.getId()-Global.ID_BIAS);
         Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
     }
 
@@ -95,7 +95,7 @@ public class CustGoodsActivity extends AppCompatActivity implements View.OnClick
             switch (choose){
                 case Dialog.BUTTON_POSITIVE:
                     dbAgent.delCustomer(cust_id);
-
+                    Global.isListEdit = true;
                     finish();
                     break;
                 case Dialog.BUTTON_NEGATIVE:

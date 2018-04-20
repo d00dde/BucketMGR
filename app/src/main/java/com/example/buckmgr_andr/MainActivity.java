@@ -14,11 +14,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //this.deleteDatabase ("myDBase");
         DBAgent.setDBAgent(this);
 
     }
     public void onCustClick (View v) {
         Intent intent = new Intent(this,CustomerActivity.class);
+        startActivity(intent);
+    }
+
+    public void onGoodsClick (View v) {
+        Intent intent = new Intent(this,GoodsActivity.class);
         startActivity(intent);
     }
 

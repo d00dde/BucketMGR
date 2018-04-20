@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-public class CustomerActivity extends AppCompatActivity implements View.OnClickListener {
+public class GoodsActivity extends AppCompatActivity implements View.OnClickListener {
 
 
     Map <Integer, String> names;
@@ -30,10 +30,10 @@ public class CustomerActivity extends AppCompatActivity implements View.OnClickL
 
         DBAgent dbagent = DBAgent.getAgent();
         names = new TreeMap <>();
-        dbagent.getCustNames(names);
-        Button addCust = (Button) findViewById(R.id.addCustomer);
-        addCust.setText("Добавить заказчика");
-        addCust.setOnClickListener(this);
+        dbagent.getGoodsNames(names);
+        Button addGoods = (Button) findViewById(R.id.addCustomer);
+        addGoods.setText("Добавить товар");
+        addGoods.setOnClickListener(this);
         inflanter = getLayoutInflater();
         scrolLay = (LinearLayout) findViewById(R.id.ScrolLay_1);
 
@@ -51,7 +51,7 @@ public class CustomerActivity extends AppCompatActivity implements View.OnClickL
     public void onClick(View v) {
         String str = "Нажата кнопка номер " + (v.getId()-Global.ID_BIAS);
         if(v.getId() == R.id.addCustomer) {
-            Toast.makeText(this, "Нажата добавить заказчика", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Нажата добавить товар", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(this, AddCustomer.class);
             startActivity(intent);
         }
@@ -60,14 +60,6 @@ public class CustomerActivity extends AppCompatActivity implements View.OnClickL
             Intent intent = new Intent(this, CustGoodsActivity.class);
             intent.putExtra("coosenCust",v.getId()-Global.ID_BIAS);
             startActivity(intent);
-        }
-
-    }
-    public void onRestart () {
-        super.onRestart();
-        if  (Global.isListEdit) {
-            Global.isListEdit = false;
-            finish();
         }
 
     }

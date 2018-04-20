@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -30,6 +31,11 @@ public class DBAgent {
         dbHelper = new DBHelper(context);
         currCustomer = getCustQuen();
         currGoods = getGoodsQuen();
+        //SQLiteDatabase db = dbHelper.getWritableDatabase();
+        //db.execSQL("DROP TABLE IF EXISTS " + "Goods");
+        //db.execSQL("DROP TABLE IF EXISTS " + "Transactions");
+        //db.execSQL("DROP TABLE IF EXISTS " + "Customers");
+        //db.delete ("Customers", null, null);
         //initDB();
     }
     public int currCustomer; // переменная содержит текущее кол-во заказчиков в БД. Служит для сокращения кол-ва запросов к getCustQuen()
@@ -41,12 +47,12 @@ public class DBAgent {
         Cursor c = db.query("Customers", null, null, null, null, null, null);
         c.moveToPosition (id_cust);
         cv.put ("id_cust", id_cust);
-        cv.put ("name_cust", c.getString(2));
+        cv.put ("name_cust", c.getString(c.getColumnIndex("name")));
         c.close();
         c = db.query("Goods", null, null, null, null, null, null);
         c.moveToPosition (id_goods);
         cv.put ("id_goods", id_goods);
-        cv.put ("name_goods", c.getString(2));
+        cv.put ("name_goods", c.getString(c.getColumnIndex("name")));
         c.close();
         cv.put ("value", val);
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
@@ -56,12 +62,13 @@ public class DBAgent {
     }
 
     public void initDB () {
-        addCustomer ("Cust_1");
-        addCustomer ("Cust_2");
-        addCustomer ("Cust_3");
-        addGoods("Goods_1");
-        addGoods("Goods_2");
-        addGoods("Goods_3");
+        addCustomer ("Петрович");
+        addCustomer ("Степаныч");
+        addCustomer ("Джон Коннор");
+        addCustomer ("Папа Джонс");
+        addGoods("Ведро");
+        addGoods("Шмедро");
+        addGoods("Ядро");
     }
 
     public void addCustomer (String name) {
@@ -128,7 +135,6 @@ public class DBAgent {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         Cursor c = db.query("Goods", null, null, null, null, null, null);
         if(c.moveToFirst()) {
-            int i = 0;
             int nameColIndex = c.getColumnIndex("name");
             int idColIndex = c.getColumnIndex("id");
             do {
@@ -155,31 +161,35 @@ public class DBAgent {
         return debt;
     }
 
-    public void getAllDebts (int id_cust, int[] debts) {
+    public void getAllDebts (int id_cust, Map<Integer, Integer> map) {
 
-        for(int i = 0; i < currGoods; i++)
-            debts[i] = 5 + i;
+        /*for (int i = 0; i < 5; i++)
+            map.put (i, 42 + i); */
 
 
-
-        /*SQLiteDatabase db = dbHelper.getWritableDatabase();
-        Cursor c = db.rawQuery("Select id_goods, SUM(value) as SumVal from Transactions on id_cust = " + id_cust + " sort by id_goods", null);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        Cursor c = db.rawQuery("Select id_goods, SUM(value) as SumVal from Transactions on id_cust = " + id_cust + " sort by id_goods" , null);
         if(c.moveToFirst()) {
-            int pos = c.getColumnIndex("SumVal");
+            int id_goods_column = c.getColumnIndex("id_goods");
+            int sum_column = c.getColumnIndex("SumVal");
             do {
-                debt[c.getColumnIndex("id_goods")] = c.getInt(pos);
+                map.put(c.getInt(id_goods_column),c.getInt(sum_column));
             } while(c.moveToNext());
         }
         c.close();
-        dbHelper.close();*/
+        dbHelper.close();
     }
 
     public String getCustName (int id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         Cursor c = db.query("Customers", null, null, null, null, null, null);
         String str = "Неизвестный заказчик";
-        if (c.moveToPosition(id-1))
-            str = c.getString(c.getColumnIndex("name"));
+        if (c.moveToFirst()) {
+            do{
+                if(c.getInt(c.getColumnIndex("id")) == id)
+                    str = c.getString(c.getColumnIndex("name"));
+            } while (c.moveToNext());
+        }
         c.close();
         dbHelper.close();
         return str;

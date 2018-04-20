@@ -34,6 +34,7 @@ public class AddCustomer extends AppCompatActivity implements View.OnClickListen
         Toast.makeText(this, "Имя не указано", Toast.LENGTH_SHORT).show();
     else
         dbagent.addCustomer(name.getText().toString());
+        Global.isListEdit = true;
         finish();
     }
 }

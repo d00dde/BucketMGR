@@ -22,6 +22,7 @@ public class CustomerActivity extends AppCompatActivity implements View.OnClickL
     Map <Integer, String> names;
     LayoutInflater inflanter;
     LinearLayout scrolLay;
+    String type;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,13 +30,25 @@ public class CustomerActivity extends AppCompatActivity implements View.OnClickL
         setContentView(R.layout.activity_customer);
 
         DBAgent dbagent = DBAgent.getAgent();
+        Intent intent = getIntent();
+        type = intent.getStringExtra("type");
+
+
         names = new TreeMap <>();
-        dbagent.getCustNames(names);
+
         Button addCust = (Button) findViewById(R.id.addCustomer);
-        addCust.setText("Добавить заказчика");
         addCust.setOnClickListener(this);
         inflanter = getLayoutInflater();
         scrolLay = (LinearLayout) findViewById(R.id.ScrolLay_1);
+
+        if ((type.equals("customer"))) {
+            dbagent.getCustNames(names);
+            addCust.setText("Добавить заказчика");
+        }
+        else if ((type.equals("goods"))){
+            dbagent.getGoodsNames(names);
+            addCust.setText("Добавить товар");
+        }
 
         for (Map.Entry<Integer, String> customer : names.entrySet()) {
             View item = inflanter.inflate(R.layout.button_mp,scrolLay,false );
@@ -49,17 +62,31 @@ public class CustomerActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onClick(View v) {
-        String str = "Нажата кнопка номер " + (v.getId()-Global.ID_BIAS);
         if(v.getId() == R.id.addCustomer) {
-            Toast.makeText(this, "Нажата добавить заказчика", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(this, AddCustomer.class);
-            startActivity(intent);
+            if ((type.equals("customer"))) {
+                Intent intent = new Intent(this, AddCustomer.class);
+                intent.putExtra("type", "customer");
+                startActivity(intent);
+            }
+            else if ((type.equals("goods"))){
+                Intent intent = new Intent(this, AddCustomer.class);
+                intent.putExtra("type", "goods");
+                startActivity(intent);
+            }
         }
         else {
-            Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(this, CustGoodsActivity.class);
-            intent.putExtra("choosenCust",v.getId()-Global.ID_BIAS);
-            startActivity(intent);
+            if ((type.equals("customer"))) {
+                Intent intent = new Intent(this, CustGoodsActivity.class);
+                intent.putExtra("choosen",v.getId()-Global.ID_BIAS);
+                intent.putExtra("type", "customer");
+                startActivity(intent);
+            }
+            else if ((type.equals("goods"))) {
+                Intent intent = new Intent(this, CustGoodsActivity.class);
+                intent.putExtra("choosen",v.getId()-Global.ID_BIAS);
+                intent.putExtra("type", "goods");
+                startActivity(intent);
+            }
         }
 
     }

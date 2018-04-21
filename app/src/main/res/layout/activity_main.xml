@@ -38,7 +38,7 @@
             android:layout_gravity="bottom"
             android:layout_weight="2"
             android:text="@string/btnCust"
-            android:onClick="onCustClick"
+            android:onClick="onClick"
             android:textSize="18sp" />
 
         <Button
@@ -49,7 +49,7 @@
             android:layout_gravity="bottom"
             android:layout_weight="2"
             android:text="@string/Goods"
-            android:onClick="onGoodsClick"
+            android:onClick="onClick"
             android:textSize="18sp" />
 
     </LinearLayout>
@@ -68,7 +68,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:text="@string/addCust"
-            android:onClick="onAddCustClick"
+            android:onClick="onClick"
             android:textSize="18sp" />
 
         <Button
@@ -78,7 +78,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:text="@string/addGoods"
-            android:onClick="onAddGoodsClick"
+            android:onClick="onClick"
             android:textSize="18sp" />
     </LinearLayout>
 

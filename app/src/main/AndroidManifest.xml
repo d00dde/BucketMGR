@@ -18,12 +18,12 @@
         </activity>
         <activity android:name=".CustomerActivity" />
         <activity android:name=".CustGoodsActivity" />
-        <activity android:name=".AddCustomer"
-            android:windowSoftInputMode="stateVisible"/>
-        <activity android:name=".GoodsActivity" />
-        <activity android:name=".writeTransactionActivity"
-                    android:windowSoftInputMode="stateVisible"
-            ></activity>
+        <activity
+            android:name=".AddCustomer"
+            android:windowSoftInputMode="stateVisible" />
+        <activity
+            android:name=".writeTransactionActivity"
+            android:windowSoftInputMode="stateVisible" />
     </application>
 
 </manifest>

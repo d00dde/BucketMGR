@@ -54,7 +54,7 @@ public class writeTransactionActivity extends AppCompatActivity implements View.
         if (cust_id == -1)
             goodsName.setText("Нет такого товара");
         else
-            goodsName.setText(dbAgent.getGoodsName(cust_id));
+            goodsName.setText(dbAgent.getGoodsName(goods_id));
 
     }
 
@@ -63,7 +63,9 @@ public class writeTransactionActivity extends AppCompatActivity implements View.
     public void onClick(View v) {
         int val = Integer.parseInt(value.getText().toString());
         dbAgent.writeTransaction(cust_id,goods_id, val);
+         Global.isListEdit = true;
         Toast.makeText(cont, "Записана транзакция " + val + " штук.", Toast.LENGTH_SHORT).show();
+        finish();
     }
 
 }

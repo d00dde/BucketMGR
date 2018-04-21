@@ -23,6 +23,7 @@ public class CustGoodsActivity extends AppCompatActivity implements View.OnClick
     final int DIALOG_DEL = 1;
     DBAgent dbAgent;
     int cust_id = -1;
+    String type;
 
 
 
@@ -33,38 +34,56 @@ public class CustGoodsActivity extends AppCompatActivity implements View.OnClick
         setContentView(R.layout.activity_cust_goods);
         dbAgent = DBAgent.getAgent();
         TextView title = (TextView) findViewById(R.id.CustomerName);
-        //Button btnDelCast = (Button) findViewById(R.id.btnDelCast);
-        //btnDelCast.setOnClickListener(this);
+        Button btndel = (Button) findViewById(R.id.btnDelCast);
 
         Intent intent = getIntent();
-        cust_id = intent.getIntExtra("choosenCust", -1);
+        type = intent.getStringExtra("type");
+        cust_id = intent.getIntExtra("choosen", -1);
         if (cust_id == -1)
-            title.setText("Нет такого клиента");
-        else
-            title.setText(dbAgent.getCustName(cust_id));
+            title.setText("Нет такой записи");
 
-
-        //DBAgent dbagent = DBAgent.getAgent();
         Map<Integer, String> names = new TreeMap<>();
         Map<Integer, Integer> debts = new TreeMap<>();
-        dbAgent.getGoodsNames(names);
-        dbAgent.getAllDebts(cust_id,debts);
 
         LinearLayout scrolLay = (LinearLayout) findViewById(R.id.goodsLay);
         LayoutInflater inflanter = getLayoutInflater();
 
-        for (Map.Entry<Integer, String> customer : names.entrySet()) {
-            View item = inflanter.inflate(R.layout.goods_list,scrolLay,false );
-            Button btn = (Button) item.findViewById(R.id.btn_goods);
-            TextView debt = (TextView) item.findViewById(R.id.debt);
-            btn.setText(customer.getValue());
-            btn.setId(Global.ID_BIAS + customer.getKey());
-            btn.setOnClickListener(this);
-            String temp = debts.get(customer.getKey()) == null ? "0" : debts.get(customer.getKey()).toString();
-            debt.setText("Долг: " + temp );
-            scrolLay.addView(item);
-
+        if ((type.equals("customer"))) {
+            title.setText(dbAgent.getCustName(cust_id));
+            btndel.setText("Удалить заказчика");
+            dbAgent.getGoodsNames(names);
+            dbAgent.getDebtsfromCust(cust_id,debts);
+            for (Map.Entry<Integer, String> current : names.entrySet()) {
+                View item = inflanter.inflate(R.layout.goods_list,scrolLay,false );
+                Button btn = (Button) item.findViewById(R.id.btn_goods);
+                TextView debt = (TextView) item.findViewById(R.id.debt);
+                btn.setText(current.getValue());
+                btn.setId(Global.ID_BIAS + current.getKey());
+                btn.setOnClickListener(this);
+                String temp = debts.get(current.getKey()) == null ? "0" : debts.get(current.getKey()).toString();
+                debt.setText("Долг: " + temp );
+                scrolLay.addView(item);
+            }
         }
+        else if ((type.equals("goods"))) {
+            title.setText(dbAgent.getGoodsName(cust_id));
+            btndel.setText("Удалить товар");
+            dbAgent.getCustNames(names);
+            dbAgent.getDebtsfromGoods(cust_id,debts);
+            for (Map.Entry<Integer, String> current : names.entrySet()) {
+                if (debts.get(current.getKey()) != null) {
+                    View item = inflanter.inflate(R.layout.goods_list, scrolLay, false);
+                    Button btn = (Button) item.findViewById(R.id.btn_goods);
+                    TextView debt = (TextView) item.findViewById(R.id.debt);
+                    btn.setText(current.getValue());
+                    btn.setId(Global.ID_BIAS + current.getKey());
+                    btn.setOnClickListener(this);
+                    debt.setText("Долг: " + debts.get(current.getKey()).toString());
+                    scrolLay.addView(item);
+                }
+            }
+        }
+
     }
 
 
@@ -73,8 +92,14 @@ public class CustGoodsActivity extends AppCompatActivity implements View.OnClick
         String str = "Нажата кнопка номер " + (v.getId()-Global.ID_BIAS);
         Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, writeTransactionActivity.class);
-        intent.putExtra("choosenCust",cust_id);
-        intent.putExtra("choosenGoods",v.getId()-Global.ID_BIAS);
+        if ((type.equals("customer"))){
+            intent.putExtra("choosenCust",cust_id);
+            intent.putExtra("choosenGoods",v.getId()-Global.ID_BIAS);
+        }
+        else if ((type.equals("goods"))) {
+            intent.putExtra("choosenCust",v.getId()-Global.ID_BIAS);
+            intent.putExtra("choosenGoods",cust_id);
+        }
         startActivity(intent);
 
     }
@@ -85,12 +110,22 @@ public class CustGoodsActivity extends AppCompatActivity implements View.OnClick
 
     protected Dialog onCreateDialog (int id) {
         if (id == DIALOG_DEL){
-            AlertDialog.Builder adb = new AlertDialog.Builder(this);
-            adb.setTitle("Удаление заказчика");
-            adb.setMessage("Вы действительно хотите удалить заказчика " + dbAgent.getCustName(cust_id) + "?");
-            adb.setPositiveButton("Да", myClickListener);
-            adb.setNegativeButton("Нет",myClickListener);
-            return adb.create();
+            if ((type.equals("customer"))) {
+                AlertDialog.Builder adb = new AlertDialog.Builder(this);
+                adb.setTitle("Удаление заказчика");
+                adb.setMessage("Вы действительно хотите удалить заказчика " + dbAgent.getCustName(cust_id) + "?");
+                adb.setPositiveButton("Да", myClickListener);
+                adb.setNegativeButton("Нет",myClickListener);
+                return adb.create();
+            }
+            else if ((type.equals("goods"))) {
+                AlertDialog.Builder adb = new AlertDialog.Builder(this);
+                adb.setTitle("Удаление товара");
+                adb.setMessage("Вы действительно хотите удалить товар " + dbAgent.getGoodsName(cust_id) + "?");
+                adb.setPositiveButton("Да", myClickListener);
+                adb.setNegativeButton("Нет",myClickListener);
+                return adb.create();
+            }
         }
         return super.onCreateDialog(id);
     }
@@ -99,6 +134,12 @@ public class CustGoodsActivity extends AppCompatActivity implements View.OnClick
         public void onClick (DialogInterface dialog, int choose){
             switch (choose){
                 case Dialog.BUTTON_POSITIVE:
+                    if ((type.equals("customer"))) {
+                        dbAgent.delCustomer(cust_id);
+                    }
+                    else if ((type.equals("goods"))) {
+                        dbAgent.delGoods(cust_id);
+                    }
                     dbAgent.delCustomer(cust_id);
                     Global.isListEdit = true;
                     finish();
@@ -110,5 +151,12 @@ public class CustGoodsActivity extends AppCompatActivity implements View.OnClick
         }
     };
 
+    public void onRestart() {
+        super.onRestart();
+        if (Global.isListEdit) {
+            Global.isListEdit = false;
+            finish();
+        }
+    }
 
 }

@@ -78,13 +78,14 @@ public class DBAgent {
     }
 
     public void initDB () {
-        addCustomer ("Петрович");
-        addCustomer ("Степаныч");
-        addCustomer ("Джон Коннор");
-        addCustomer ("Папа Джонс");
-        addGoods("Ведро");
-        addGoods("Шмедро");
-        addGoods("Ядро");
+        addCustomer ("Первый");
+        addCustomer ("Второй");
+        addCustomer ("Третий");
+        addCustomer ("Четвертый");
+        addCustomer ("Пятый");
+        addGoods("Первое");
+        addGoods("Второе");
+        addGoods("Третье");
     }
 
     public void addCustomer (String name) {
@@ -161,27 +162,7 @@ public class DBAgent {
         dbHelper.close();
     }
 
-    public int getDebt (int id_cust, int id_goods) {
-        String sqlQuery = "Select value from Transactions on id_cust = " + id_cust + " while id_goods = " + id_goods;
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        Cursor c = db.rawQuery(sqlQuery, null);
-        int debt = 0;
-        if(c.moveToFirst()) {
-            int pos = c.getColumnIndex("value");
-            do {
-                debt += c.getInt(pos);
-            } while(c.moveToNext());
-        }
-        c.close();
-        dbHelper.close();
-        return debt;
-    }
-
-    public void getAllDebts (int id_cust, Map<Integer, Integer> map) {
-
-        /*for (int i = 0; i < 5; i++)
-            map.put (i, 42 + i); */
-
+    public void getDebtsfromCust (int id_cust, Map<Integer, Integer> map) {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         Cursor c = db.rawQuery("Select id_goods, SUM(value) as SumVal from Transactions where id_cust = " + id_cust + " group by id_goods" , null);
@@ -190,6 +171,22 @@ public class DBAgent {
             int sum_column = c.getColumnIndex("SumVal");
             do {
                 map.put(c.getInt(id_goods_column),c.getInt(sum_column));
+            } while(c.moveToNext());
+        }
+        c.close();
+        dbHelper.close();
+    }
+
+    public void getDebtsfromGoods (int id_goods, Map<Integer, Integer> map) {
+
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        Cursor c = db.rawQuery("Select id_cust, SUM(value) as SumVal from Transactions where id_goods = " + id_goods + " group by id_goods" , null);
+        if(c.moveToFirst()) {
+            int id_cust_column = c.getColumnIndex("id_cust");
+            int sum_column = c.getColumnIndex("SumVal");
+            do {
+                if (c.getInt(sum_column) != 0)
+                    map.put(c.getInt(id_cust_column),c.getInt(sum_column));
             } while(c.moveToNext());
         }
         c.close();
@@ -231,6 +228,13 @@ public class DBAgent {
         db.delete("Customers", "id =" + id_cust, null);
         db.close();
     }
+
+    public void delGoods (int id_cust) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.delete("Goods", "id =" + id_cust, null);
+        db.close();
+    }
+
 
 }
 

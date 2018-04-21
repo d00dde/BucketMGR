@@ -41,18 +41,34 @@ public class DBAgent {
     public int currCustomer; // переменная содержит текущее кол-во заказчиков в БД. Служит для сокращения кол-ва запросов к getCustQuen()
     public int currGoods; // переменная содержит текущее кол-во товаров в БД. Служит для сокращения кол-ва запросов к getGoodsQuen()
 
-    public void writeTrans (int id_cust, int id_goods, int val) {
+    public void writeTransaction (int id_cust, int id_goods, int val) {
         ContentValues cv = new ContentValues ();
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        Cursor c = db.query("Customers", null, null, null, null, null, null);
-        c.moveToPosition (id_cust);
+
         cv.put ("id_cust", id_cust);
-        cv.put ("name_cust", c.getString(c.getColumnIndex("name")));
+        Cursor c = db.query("Customers", null, null, null, null, null, null);
+        if(c.moveToFirst()){
+            int id_col = c.getColumnIndex("id");
+            do{
+                if(c.getInt(id_col) == id_cust) {
+                    cv.put ("name_cust", c.getString(c.getColumnIndex("name")));
+                    break;
+                }
+            } while (c.moveToNext());
+        }
         c.close();
-        c = db.query("Goods", null, null, null, null, null, null);
-        c.moveToPosition (id_goods);
+
         cv.put ("id_goods", id_goods);
-        cv.put ("name_goods", c.getString(c.getColumnIndex("name")));
+        c = db.query("Goods", null, null, null, null, null, null);
+        if(c.moveToFirst()){
+            int id_col = c.getColumnIndex("id");
+            do{
+                if(c.getInt(id_col) == id_cust) {
+                    cv.put ("name_goods", c.getString(c.getColumnIndex("name")));
+                    break;
+                }
+            } while (c.moveToNext());
+        }
         c.close();
         cv.put ("value", val);
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
@@ -168,7 +184,7 @@ public class DBAgent {
 
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        Cursor c = db.rawQuery("Select id_goods, SUM(value) as SumVal from Transactions on id_cust = " + id_cust + " sort by id_goods" , null);
+        Cursor c = db.rawQuery("Select id_goods, SUM(value) as SumVal from Transactions where id_cust = " + id_cust + " group by id_goods" , null);
         if(c.moveToFirst()) {
             int id_goods_column = c.getColumnIndex("id_goods");
             int sum_column = c.getColumnIndex("SumVal");
@@ -183,6 +199,21 @@ public class DBAgent {
     public String getCustName (int id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         Cursor c = db.query("Customers", null, null, null, null, null, null);
+        String str = "Неизвестный заказчик";
+        if (c.moveToFirst()) {
+            do{
+                if(c.getInt(c.getColumnIndex("id")) == id)
+                    str = c.getString(c.getColumnIndex("name"));
+            } while (c.moveToNext());
+        }
+        c.close();
+        dbHelper.close();
+        return str;
+    }
+
+    public String getGoodsName (int id) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        Cursor c = db.query("Goods", null, null, null, null, null, null);
         String str = "Неизвестный заказчик";
         if (c.moveToFirst()) {
             do{

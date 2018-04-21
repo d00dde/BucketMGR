@@ -58,7 +58,7 @@ public class CustomerActivity extends AppCompatActivity implements View.OnClickL
         else {
             Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(this, CustGoodsActivity.class);
-            intent.putExtra("coosenCust",v.getId()-Global.ID_BIAS);
+            intent.putExtra("choosenCust",v.getId()-Global.ID_BIAS);
             startActivity(intent);
         }
 

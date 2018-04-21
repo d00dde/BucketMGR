@@ -29,7 +29,10 @@ public class DBHelper extends SQLiteOpenHelper {
                 + "name_cust text,"
                 + "id_goods integer,"
                 + "name_goods text,"
+                + "value integer,"
                 + "date date" + ");");
+        //DBAgent agent = DBAgent.getAgent();
+        //agent.initDB();
 
     }
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

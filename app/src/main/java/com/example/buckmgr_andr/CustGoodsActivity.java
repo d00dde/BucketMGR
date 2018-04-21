@@ -37,19 +37,18 @@ public class CustGoodsActivity extends AppCompatActivity implements View.OnClick
         //btnDelCast.setOnClickListener(this);
 
         Intent intent = getIntent();
-        cust_id = intent.getIntExtra("coosenCust", -1);
+        cust_id = intent.getIntExtra("choosenCust", -1);
         if (cust_id == -1)
             title.setText("Нет такого клиента");
         else
-            Log.d(Global.DTAG, " Запрошено имя для id : " + cust_id);
             title.setText(dbAgent.getCustName(cust_id));
 
 
-        DBAgent dbagent = DBAgent.getAgent();
+        //DBAgent dbagent = DBAgent.getAgent();
         Map<Integer, String> names = new TreeMap<>();
         Map<Integer, Integer> debts = new TreeMap<>();
-        dbagent.getGoodsNames(names);
-        dbagent.getAllDebts(cust_id,debts);
+        dbAgent.getGoodsNames(names);
+        dbAgent.getAllDebts(cust_id,debts);
 
         LinearLayout scrolLay = (LinearLayout) findViewById(R.id.goodsLay);
         LayoutInflater inflanter = getLayoutInflater();
@@ -61,7 +60,8 @@ public class CustGoodsActivity extends AppCompatActivity implements View.OnClick
             btn.setText(customer.getValue());
             btn.setId(Global.ID_BIAS + customer.getKey());
             btn.setOnClickListener(this);
-            debt.setText("Долг: " + debts.get(customer.getKey()) == null ? 0 : debts.get(customer.getKey()));
+            String temp = debts.get(customer.getKey()) == null ? "0" : debts.get(customer.getKey()).toString();
+            debt.setText("Долг: " + temp );
             scrolLay.addView(item);
 
         }
@@ -72,6 +72,11 @@ public class CustGoodsActivity extends AppCompatActivity implements View.OnClick
     public void onClick(View v) {
         String str = "Нажата кнопка номер " + (v.getId()-Global.ID_BIAS);
         Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, writeTransactionActivity.class);
+        intent.putExtra("choosenCust",cust_id);
+        intent.putExtra("choosenGoods",v.getId()-Global.ID_BIAS);
+        startActivity(intent);
+
     }
 
     public void delCustomer (View V) {
